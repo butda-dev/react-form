@@ -30,12 +30,20 @@
 .label {
     display: flex;
     flex-direction: column;
-    margin-bottom: 27px;
     font-style: normal;
     font-weight: 500;
     font-size: 16px;
     line-height: 21px;
     color: #756F86;
+}
+
+.label > p {
+    font-size: 14px;
+    color: #FF7171;
+}
+
+.hidden {
+    visibility: hidden;
 }
 
 .label > input, .label > select {
@@ -54,9 +62,20 @@
     background: url('./img/Chevron-bottom.png') no-repeat right;
 }
 
+.label > select:focus {
+    border: 2px solid #0880AE;
+    color: #2C2738;
+}
+
+.label option {
+    color: #756F86;
+}
+
 .checkbox {
     display: flex;
     align-items: center;
+    margin-bottom: 40px;
+    font-size: 14px;
 }
 
 #toggle {
@@ -79,8 +98,26 @@
     background: url('./img/check.png') no-repeat center;
 }
 
+.btnSubmit {
+    padding: 20px 0;
+    background: #0880AE;
+    border-radius: 5px;
+    border:none;
+    font-size: 16px;
+    color: #EBF4F8;
+}
+
+.btnSubmit:disabled {
+    background: #DBE2EA;
+    color: #B1B5BF;
+}
+
 @media screen and (min-width: 460px) {
     .container {
         width: 460px;
+    }
+
+    .checkbox {
+        font-size: 16px;
     }
   }
