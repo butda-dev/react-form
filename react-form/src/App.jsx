@@ -7,16 +7,20 @@ class App extends React.Component {
         super(props);
         this.state = {
             language: 'Язык',
-            submitButton: 'disabled',
+            dissabledButton: 'disabled',
             isChecked: false,
             name: '',
-            nameError: false,
+            isNameError: false,
+            email: '',
+            isEmailError: false,
+            tel: '',
+            isTelError: false,
         };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleChecked = this.handleChecked.bind(this);
-        this.handleChangeName = this.handleChangeName.bind(this);
+        this.handleChangeField = this.handleChangeField.bind(this);
     }
 
     handleChange(event) {
@@ -32,20 +36,55 @@ class App extends React.Component {
         event.preventDefault();
     }
 
-    handleChangeName(event) {
-        const name = event.target.value;
-        let error = false;
+    handleChangeField(event) {
+        const type = event.target.type;
+        const value = event.target.value;
+        const format = FormatType[type];
+        const stateName = StateNameType[type];
+        const stateError = StateErrorType[type];
+        let error = value ? false : true;
 
-        for (let i = 0; i < name.length; i++) {
-            let letter = name.charAt(i);
-
-            if(!isNaN(parseInt(letter)) && isFinite(letter)){
-                error = true;
-                break;
-            }
+        if (type === 'tel') {
+            error = value.length > 15;
         }
 
-        this.setState({name: name, nameError: error});
+        if (type === 'email') {
+            error = !format.test(value);
+        }else if (!error) {
+            for (let i = 0; i < value.length; i++) {
+                let letter = value.charAt(i);
+
+                if(!format.test(letter)){
+                    error = true;
+                    break;
+                }
+            }
+        }
+        
+        const disValue = this.state.dissabledButton;
+        let disabledButton = this.getDisableSubmitButton(error, disValue);
+
+        if (disabledButton !== disValue) {
+            this.setState({[stateName]: value, [stateError]: error, dissabledButton: disabledButton});
+        }else {
+            this.setState({[stateName]: value, [stateError]: error});
+        }
+        
+    }
+
+    getDisableSubmitButton(error, disValue) {
+        let result = disValue;
+        const isDissButton = result === 'disabled';
+    
+        if (isDissButton && !error) {
+            result = '';
+        }
+    
+        if (!isDissButton && error) {
+            result = 'disabled';
+        }
+    
+        return result;
     }
 
     render() {
@@ -65,25 +104,25 @@ class App extends React.Component {
                     
                     <label className={style.label}>
                         Имя
-                        <input type="text" placeholder="Введите ваше имя" value={this.state.name} onChange={this.handleChangeName}/>
-                        <p className={this.state.nameError ? "" : style.hidden}>Введено не корректное значение</p>
+                        <input type="text" placeholder="Введите ваше имя" value={this.state.name} onChange={this.handleChangeField}/>
+                        <p className={this.state.isNameError ? '' : style.hidden}>Введено не корректное значение</p>
                     </label>
                     
                     <label className={style.label}>
                         Email
-                        <input type="email" placeholder="Введите ваш email" />
-                        <p>Введено не корректное значение</p>
+                        <input type="email" placeholder="Введите ваш email" value={this.state.email} onChange={this.handleChangeField}/>
+                        <p className={this.state.isEmailError ? '' : style.hidden}>Введено не корректное значение</p>
                     </label>
                     
                     <label className={style.label}>
                         Номер телефона
-                        <input type="tel" placeholder="Введите номер телефона" />
-                        <p>Введено не корректное значение</p>
+                        <input type="tel" placeholder="Введите номер телефона" value={this.state.tel} onChange={this.handleChangeField}/>
+                        <p className={this.state.isTelError ? '' : style.hidden}>Введено не корректное значение</p>
                     </label>
                     
                     <label className={style.label}>
                         Язык
-                        <select defaultValue="Язык" onChange={this.handleChange}>
+                        <select value={this.state.language} onChange={this.handleChange}>
                             {languages.map((item, index) => <option key={index} value={item}>{item}</option>)}
                         </select>
                     </label>
@@ -94,11 +133,29 @@ class App extends React.Component {
                         <p>Принимаю <a className={style.link} href='#'>условия</a> использования</p>
                     </label>
 
-                    <input disabled={this.state.submitButton} className={style.btnSubmit} type="submit" value="Зарегистрироваться" />
+                    <input disabled={this.state.dissabledButton} className={style.btnSubmit} type="submit" value="Зарегистрироваться" />
                 </form>
             </div>
         );
     }
+}
+
+const FormatType = {
+    text: /[a-zA-Zа-яА-Я- ]/,
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    tel: /[0-9()-+]/,
+}
+
+const StateNameType = {
+    text: 'name',
+    email: 'email',
+    tel: 'tel',
+}
+
+const StateErrorType = {
+    text: 'isNameError',
+    email: 'isEmailError',
+    tel: 'isTelError',
 }
 
 export default App;
